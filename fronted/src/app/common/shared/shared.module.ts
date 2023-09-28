@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ValidDirective } from '../directives/valid.directive';
 import { HttpClientModule } from '@angular/common/http';
+import { TableComponent } from '../component/table/table.component';
 
 @NgModule({
   declarations: [],
@@ -11,12 +12,14 @@ import { HttpClientModule } from '@angular/common/http';
     CommonModule,
     FormsModule,
     RouterModule,
+    TableComponent,
     ValidDirective,
     HttpClientModule
   ],
   exports: [
     CommonModule,
     FormsModule,
+    TableComponent,
     RouterModule,
     ValidDirective,
     HttpClientModule
