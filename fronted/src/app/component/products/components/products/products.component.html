@@ -1,0 +1,80 @@
+<app-blank title="Ürünler" sectionTitle="Ürünler Listesi">
+  <app-table [heads]='[
+"#",
+"Ürün Resmi",
+"Kategoriler",
+"Stok Bilgisi",
+"Birim Fiyatı",
+"Oluşturulma Tarihi",
+"Aktif / Pasif",
+"İşlemler"
+]'>
+    <tr *ngFor="let product of result.datas let index = index">
+      <td>{{index + 1}}</td>
+      <td><img [src]="'http://localhost:5000/' + product.imageUrls[0].path" alt="" width="50"></td>
+      <td>{{product.name}}</td>
+      <td>
+        <ul>
+          <li *ngFor="let category of product.categories">
+            {{category.name}}
+          </li>
+        </ul>
+      </td>
+      <td>{{product.stock}}</td>
+      <td>{{product.price}}</td>
+      <td>{{product.createdDate | date: 'dd.MM.yyyy HH:mm:sss'}}</td>
+      <td>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-outline-warning btn-sm" title="Güncelle">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm" title="Sil">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  </app-table>
+  <div class="form-group mb-2">
+    <button class="btn btn-outline-primary" routerLink="/">
+      <i class="fa fa-plus"></i>
+    </button>
+    <div class="search col-md-3">
+      <input class="form-control" type="search" [(ngModel)]="request.search" placeholder="Arama yapın..."
+        (keyup)="search()" (search)="getAll(1)">
+    </div>
+  </div>
+
+  <select name="pageSize" id="pageSize" [(ngModel)]="request.pageSize" class="selectBox form-control text-center">
+    <option value="">5</option>
+    <option value="">10</option>
+    <option value="">20</option>
+    <option value="">50</option>
+    <option value="">100</option>
+    <option value="">200</option>
+    <option value="">500</option>
+    <option value="">1000</option>
+  </select>
+  <nav class="pagination-nav">
+    <ul class="pagination">
+      <li class="page-item" [ngClass]="result.isFirstPage ? 'disabled' : ''">
+        <a class="page-link" (click)="getAll(1)">İlk Sayfa</a>
+      </li>
+      <li class="page-item" [ngClass]="result.isFirstPage ? 'disabled' : ''">
+        <a class="page-link" (click)="getAll(request.pageNumber -1)">Önceki</a>
+      </li>
+      <li class="page-item" *ngFor="let p of pageNumbers">
+        <a class="page-link" [ngClass]="result.pageNumber == p? 'active' : ''" (click)="getAll(p)">{{p}}</a>
+      </li>
+      <li class="page-item" [ngClass]="result.isLastPage ? 'disabled':''">
+        <a class="page-link" (click)="getAll(request.pageNumber - 1)">Sonraki</a>
+      </li>
+      <li class="page-item" [ngClass]="result.isLastPage ? 'disabled' : ''">
+        <a class="page-link" (click)="getAll(result.totalPageCount)">Son Sayfa</a>
+      </li>
+    </ul>
+  </nav>
+</app-blank>

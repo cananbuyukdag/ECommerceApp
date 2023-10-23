@@ -8,7 +8,7 @@ const response = require("../services/response.service");
 
 //Product Add
 
-router.post("/add",upload.array["images"], async(req, res)=>{
+router.post("/add",upload.array("images"), async(req, res)=>{
     response(res, async ()=>{
         const {name, stock, price, categories} = req.body;
         const productId = uuidv4();
@@ -43,42 +43,44 @@ router.post("/removeById", async (req, res)=>{
 
 //Product List
 
-router.post("/", async()=>{
-    const {pageNumber, pageSize, search} = req.body;
+router.post("/", async(req, res)=> {
+    response(res, async()=> {
+        const {pageNumber, pageSize, search} = req.body;
 
-    let productCount = await Product.find({
-        $or: [
-            {
-            name: {$regex: search, $options: 'i'}
-            }
+        let productCount = await Product.find({
+            $or: [
+                {
+                    name: { $regex: search, $options: 'i'}
+                }
             ]
-    }).count();
-    let products = await Product
-    .find({
-        $or: [
-            {
-            name: {$regex: search, $options: 'i'}
-            }
+        }).count();
+
+        let products = await Product
+        .find({
+            $or: [
+                {
+                    name: { $regex: search, $options: 'i'}
+                }
             ]
-    })
-    .sort({name: 1})
-    .populate("categories")
-    .skip((pageNumber -1) * pageSize)
-    .limit(pageSize);
+        })
+        .sort({name: 1})
+        .populate("categories")
+        .skip((pageNumber - 1) * pageSize)
+        .limit(pageSize);
 
-    let totalPageCount = Math.ceil(productCount / pageSize);
-    let model = {
-        datas: products,
-        pageNumber: pageNumber,
-        pageSize: pageSize,
-        totalPageCount: totalPageCount,
-        isFirstPage: pageNumber == 1 ? true : false,
-        isLastPage: totalPageCount == pageNumber ? true : false
-    };
-    res.json(model);
+        let totalPageCount = Math.ceil(productCount / pageSize);
+        let model = {
+            datas: products,
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            totalPageCount: totalPageCount,
+            isFirstPage: pageNumber == 1 ? true : false,
+            isLastPage: totalPageCount == pageNumber ? true : false
+        };
 
+        res.json(model);
+    });
 });
-
 // Product get id list
 
 router.post("/getById", async(req, res)=>{
@@ -88,9 +90,23 @@ router.post("/getById", async(req, res)=>{
         res.json(product);
     });
 })
+//Product Status Change
+router.post("/changeActiveStatus", async(req, res)=>{
+    response(res, async()=> {
+        const {_id} = req.body;
+        let product = await Product.findById(_id);
+        product.isActive = !product.isActive;
+        await Product.findByIdAndUpdate(_id, product);
+        if(product.isActive == true){
+            res.json({message: "Ürün aktif edildi."});
+        }else{
+            res.json({message:"Ürün pasif edildi."});
+        }
+    });
+});
 
 //Product Update
-router.post("/update", upload.array(images), async(req, res)=>{
+router.post("/update", upload.array("images"), async(req, res)=>{
     response(res, async()=>{
         const {_id, name, stock, price, categories} = req.body;
 
